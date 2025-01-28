@@ -146,6 +146,10 @@ jobs:
       - name: Install dependencies
         run: |
           ./windows/bootstrap.sh
+      - name: Verify Poppler Paths
+        run: |
+          find / -name "libpoppler*.dll" 2>/dev/null || true
+          find / -name "Poppler-0.18.typelib" 2>/dev/null || true
       - name: Set up environment
         run: |
           cp .env.ci .env
