@@ -47,25 +47,36 @@ class Window(Gtk.ApplicationWindow):
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             file_path = dialog.get_filename()
-            self.show_message(f"Arquivo selecionado:\n{file_path}")
-            #self.load_pdf(file_path)
+            self.load_pdf(file_path)
         dialog.close()
 
     def load_pdf(self, file_path):
-        self.document = Poppler.Document.new_from_file(f"file://{file_path}", None)
-        self.current_page = 0
-        self.render_page()
+        try:
+            self.document = Poppler.Document.new_from_file(f"file://{file_path}", None)
+            if not self.document:
+                raise ValueError("O documento não pôde ser carregado.")
+
+            self.current_page = 0
+            self.render_page()
+        except Exception as e:
+            self.show_message(f"Erro ao abrir o PDF: {e}")
 
     def render_page(self):
-        if self.document:
-            page = self.document.get_page(self.current_page)
-            width, height = page.get_size()
+        try:
+            if self.document:
+                page = self.document.get_page(self.current_page)
+                if not page:
+                    raise ValueError("Não foi possível carregar a página do PDF.")
 
-            # Configurando a área de desenho
-            self.pdf_area.set_size_request(int(width), int(height))
-            self.pdf_area.connect("draw", self.on_draw_pdf, page)
-            self.pdf_area.queue_draw()
+                width, height = page.get_size()
 
+                # Configurando a área de desenho
+                self.pdf_area.set_size_request(int(width), int(height))
+                self.pdf_area.connect("draw", self.on_draw_pdf, page)
+                self.pdf_area.queue_draw()
+        except Exception as e:
+            self.show_message(f"Erro ao renderizar o PDF: {e}")
+            
     def on_draw_pdf(self, widget, cr, page):
         page.render(cr)
         return False
