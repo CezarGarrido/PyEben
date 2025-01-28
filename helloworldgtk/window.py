@@ -49,7 +49,11 @@ class Window(Gtk.ApplicationWindow):
             file_path = dialog.get_filename()
             self.load_pdf(file_path)
         dialog.close()
-
+        # Força a destruição do diálogo e processa o loop de eventos
+        dialog.destroy()
+        while Gtk.events_pending():
+            Gtk.main_iteration_do(False)
+            
     def load_pdf(self, file_path):
         self.document = Poppler.Document.new_from_file(f"file://{file_path}", None)
         self.current_page = 0
