@@ -47,13 +47,10 @@ class Window(Gtk.ApplicationWindow):
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             file_path = dialog.get_filename()
-            self.load_pdf(file_path)
+            self.show_message(f"Arquivo selecionado:\n{file_path}")
+            #self.load_pdf(file_path)
         dialog.close()
-        # Força a destruição do diálogo e processa o loop de eventos
-        dialog.destroy()
-        while Gtk.events_pending():
-            Gtk.main_iteration_do(False)
-            
+
     def load_pdf(self, file_path):
         self.document = Poppler.Document.new_from_file(f"file://{file_path}", None)
         self.current_page = 0
@@ -72,3 +69,15 @@ class Window(Gtk.ApplicationWindow):
     def on_draw_pdf(self, widget, cr, page):
         page.render(cr)
         return False
+
+    def show_message(self, message):
+        msg_dialog = Gtk.MessageDialog(
+            transient_for=self,
+            flags=0,
+            message_type=Gtk.MessageType.INFO,
+            buttons=Gtk.ButtonsType.OK,
+            text="Informação",
+        )
+        msg_dialog.format_secondary_text(message)
+        msg_dialog.run()
+        msg_dialog.destroy()
