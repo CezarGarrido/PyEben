@@ -48,7 +48,7 @@ class Window(Gtk.ApplicationWindow):
         if response == Gtk.ResponseType.OK:
             file_path = dialog.get_filename()
             self.load_pdf(file_path)
-        dialog.destroy()
+        dialog.close()
 
     def load_pdf(self, file_path):
         self.document = Poppler.Document.new_from_file(f"file://{file_path}", None)
