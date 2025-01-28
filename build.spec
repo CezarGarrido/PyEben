@@ -18,13 +18,16 @@ elif system() == "Darwin":
 elif system() == "Windows":
     # Adiciona as DLLs necessárias do Poppler
     poppler_dlls = [
-        "libpoppler-glib-8.dll"
+        "libpoppler-glib-8.dll",
+        "libcairo-2.dll",
+        "libglib-2.0-0.dll",
+        "libgobject-2.0-0.dll",
     ]
 
     for dll in poppler_dlls:
         dll_path = os.path.join(os.environ["MSYSTEM_PREFIX"], "bin", dll)
         if os.path.exists(dll_path):
-            datas.append((dll_path, dll))
+            datas.append((dll_path, "."))
     # Adiciona arquivos `.typelib` do GObject Introspection
     typelibs = [
         "Poppler-0.18.typelib"
@@ -33,7 +36,7 @@ elif system() == "Windows":
     for typelib in typelibs:
         typelib_path = os.path.join(os.environ["MSYSTEM_PREFIX"], "lib", "girepository-1.0", typelib)
         if os.path.exists(typelib_path):
-            datas.append((typelib_path, f"lib/girepository-1.0/{typelib}"))
+            datas.append((typelib_path, "lib/girepository-1.0/"))
 
 a = Analysis(
     ['helloworldgtk.py'],
