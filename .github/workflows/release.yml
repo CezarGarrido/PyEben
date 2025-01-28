@@ -146,10 +146,10 @@ jobs:
       - name: Install dependencies
         run: |
           ./windows/bootstrap.sh
-      - name: Verify Poppler Paths
+      - name: Debug MSYS2
         run: |
-          find / -name "libpoppler*.dll" 2>/dev/null || true
-          find / -name "Poppler-0.18.typelib" 2>/dev/null || true
+          ls C:/msys64/mingw64/lib/girepository-1.0/
+          ls C:/msys64/mingw64/bin/
       - name: Set up environment
         run: |
           cp .env.ci .env

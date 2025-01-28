@@ -8,6 +8,7 @@ parser.add_argument("--binary", action="store_true")
 options = parser.parse_args()
 
 datas = []
+binaries = []
 hiddenimports = ["cairo", "gi.repository.Poppler"]
 
 if system() == "Linux":
@@ -15,7 +16,12 @@ if system() == "Linux":
 elif system() == "Darwin":
     datas.append(("/usr/local/lib/girepository-1.0/Poppler-0.18.typelib", "."))
 elif system() == "Windows":
-    datas.append(("C:\\msys64\\mingw64\\lib\\girepository-1.0\\Poppler-0.18.typelib", "."))
+    datas.append(("C:/msys64/mingw64/lib/girepository-1.0/Poppler-0.18.typelib", "."))
+    binaries.extend([
+        ("C:/msys64/mingw64/bin/libpoppler-glib-8.dll", "."),
+        ("C:/msys64/mingw64/bin/libgirepository-1.0.dll", "."),
+        ("C:/msys64/mingw64/bin/libcairo-2.dll", "."),
+    ])
 
 a = Analysis(
     ['helloworldgtk.py'],
