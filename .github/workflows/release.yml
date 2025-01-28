@@ -100,12 +100,10 @@ jobs:
       - name: Install dependencies
         run: |
           ./windows/bootstrap.sh
-      
       - name: List Installed Packages
         run: |
           pacman -Q | grep poppler
           pacman -Q | grep gtk
-          
       - name: Debug MSYS2
         run: |
           ls C:/msys64/mingw64/lib/
@@ -124,7 +122,7 @@ jobs:
 
   github-release:
     name: GitHub Release
-    needs: [build-linux, build-macos, build-macos-arm, build-windows]
+    needs: [build-linux, build-macos, build-windows]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -139,11 +137,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: macos-dist
-          path: dist/
-      - name: Download macOS ARM dist
-        uses: actions/download-artifact@v4
-        with:
-          name: macos-arm-dist
           path: dist/
       - name: Download Windows dist
         uses: actions/download-artifact@v4
