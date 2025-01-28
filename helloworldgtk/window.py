@@ -1,7 +1,7 @@
 from gi import require_versions
 require_versions({"Gtk": "3.0", "Poppler": "0.18"})
 from gi.repository import Gtk, Poppler
-
+from pathlib import Path
 
 class Window(Gtk.ApplicationWindow):
 
@@ -52,7 +52,9 @@ class Window(Gtk.ApplicationWindow):
 
     def load_pdf(self, file_path):
         try:
-            self.document = Poppler.Document.new_from_file(f"file://{file_path}", None)
+            file_uri = self.convert_path_to_uri(file_path)
+            print(file_uri)
+            self.document = Poppler.Document.new_from_file(file_uri, None)
             if not self.document:
                 raise ValueError("O documento não pôde ser carregado.")
 
@@ -60,6 +62,9 @@ class Window(Gtk.ApplicationWindow):
             self.render_page()
         except Exception as e:
             self.show_message(f"Erro ao abrir o PDF: {e}")
+
+    def convert_path_to_uri(self, file_path):
+        return Path(file_path).absolute().as_uri()
 
     def render_page(self):
         try:
