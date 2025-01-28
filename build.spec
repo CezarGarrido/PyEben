@@ -7,21 +7,31 @@ parser = ArgumentParser()
 parser.add_argument("--binary", action="store_true")
 options = parser.parse_args()
 
+datas = []
+hiddenimports = ["cairo", "gi.repository.Poppler"]
+
+if system() == "Linux":
+    datas.append(("/usr/lib/x86_64-linux-gnu/girepository-1.0/Poppler-0.18.typelib", "."))
+elif system() == "Darwin":
+    datas.append(("/usr/local/lib/girepository-1.0/Poppler-0.18.typelib", "."))
+elif system() == "Windows":
+    datas.append(("C:\\msys64\\mingw64\\lib\\girepository-1.0\\Poppler-0.18.typelib", "."))
+
 a = Analysis(
     ['helloworldgtk.py'],
     pathex=[],
     binaries=[],
     datas=[
-        ('LICENSE', '.')
-    ],
-    hiddenimports=[],
+        ('LICENSE', '.')  # Adiciona o arquivo LICENSE
+    ] + datas,
+    hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={
         'gi': {
             'icons': ['Adwaita'],
             'themes': ['Adwaita'],
             'module-versions': {
-                'Gtk': '4.0'
+                'Gtk': '3.0'
             }
         }
     },

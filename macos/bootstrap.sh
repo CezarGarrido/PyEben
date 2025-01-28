@@ -1,1 +1,1 @@
-brew install pygobject3 gtk4 adwaita-icon-theme libadwaita
+brew install pygobject3 gtk+3 adwaita-icon-theme poppler

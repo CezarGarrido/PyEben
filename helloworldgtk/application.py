@@ -1,10 +1,10 @@
 from gi import require_versions
-require_versions({"Gtk": "4.0", "Adw": "1"})
-from gi.repository import Gtk, Adw
+require_versions({"Gtk": "3.0"})
+from gi.repository import Gtk
 from .window import Window
 
 
-class Application(Adw.Application):
+class Application(Gtk.Application):
 
     def __init__(self):
         super().__init__()
