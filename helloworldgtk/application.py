@@ -14,4 +14,5 @@ class Application(Gtk.Application):
 
     def do_activate(self):
         win = Window(self)
+        win.show_all()
         win.present()
