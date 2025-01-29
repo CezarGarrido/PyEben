@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório - Recibo de Doações</title>
+    <style>
+        @page {
+
+            size: a5 landscape;
+            margin: 5;
+
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            line-height: 1.5;
+            margin: 5;
+            padding: 0px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 0px;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .line {
+            border-top: 5px solid #333;
+            margin: 10px 0;
+        }
+
+        .info {
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .section {
+            margin: 5px 0;
+        }
+
+        .section h2 {
+            text-align: center;
+            margin-bottom: 0px;
+            font-size: 18px;
+        }
+
+        .data {
+            font-size: 14px;
+            margin: 0px 0;
+        }
+
+        .signature {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .signature-line {
+            margin: 5px auto;
+            border-top: 1px solid #333;
+            width: 300px;
+        }
+        .recibo-table {
+            width: 100%;
+            border-spacing: 0;
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+        }
+
+        .recibo-table td {
+            text-align: left;
+            padding: 2px;
+            vertical-align: top;
+        }
+
+        .recibo-table .label {
+            min-width: 150px; /* Define um tamanho fixo para alinhamento */
+            text-align: left;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Cabeçalho -->
+        <div class="header">
+            <h1>LAR EBENEZER - HILDA MARIA CORREA - ADAS</h1>
+            <div class="info">
+                <span>Utilidade Pública Municipal Lei N.º 1527 de 09/11/88</span>
+                <span>Utilidade Pública Estadual Lei N.º 1493 de 13/05/94</span>
+            </div>
+            <div class="info">
+                <span>Utilidade Pública Federal Portaria N.º 735 de 13/08/01</span>
+                <span>CEBAS: CCEAS 0030 Resolução N.º 05 de 02/02/04</span>
+            </div>
+            <p style="text-align: center;">Atest. de Reg. no Cons. Nasc. de Assist. Soc. R N.º 0018 Res N.º 05 de
+                02/02/04</p>
+            <p style="text-align: center;">RUA 20 DE DEZEMBRO, N.º 3170, JARDIM RASSLEN, CEP 79.813-280</p>
+            <p style="text-align: center;">DOURADOS - MS</p>
+        </div>
+
+        <!-- Título principal -->
+        <div class="section">
+            <h2 style="margin: 0; padding: 0; line-height: 1;">RECIBO DE DOAÇÕES</h2>
+            <hr style="margin-top: 0; padding: 0; border: 1px solid #333; line-height: 1;">
+            <div style="height: 30px;"></div> <!-- Espaço entre a linha e a próxima seção -->
+        </div>
+
+        <!-- Informações do recibo -->
+        <div class="section" style="margin-top: 30;">
+            <table class="recibo-table">
+                <tr>
+                    <td class="label">Recibo N.º .........:</td>
+                    <td><b>{{NUMERO_RECIBO}}</b></td>
+                    <td class="label">Emitido .........:</td>
+                    <td><b>{{DATA_EMISSAO}}</b></td>
+                </tr>
+                <tr>
+                    <td class="label">Recebemos de .........:</td>
+                    <td colspan="3"><b>{{NOME_DOADOR}}</b> ({{CODIGO_DOADOR}})</td>
+                </tr>
+                <tr>
+                    <td class="label">Endereço .........:</td>
+                    <td colspan="3"><b>{{END_RUA_DOADOR}} Nº {{END_NUMERO_DOADOR}}</b></td>
+                </tr>
+                <tr>
+                    <td class="label">Bairro .........:</td>
+                    <td colspan="3"><b>{{END_BAIRRO_DOADOR}}</b></td>
+                </tr>
+                <tr>
+                    <td class="label">Contato .........:</td>
+                    <td colspan="3"><b>{{CONTATO_DOADOR}}</b></td>
+                </tr>
+                <tr>
+                    <td class="label">Cidade .........:</td>
+                    <td colspan="3"><b>{{END_CIDADE_DOADOR}} - {{END_ESTADO_DOADOR}}</b></td>
+                </tr>
+                <tr>
+                    <td class="label">Valor .........:</td>
+                    <td colspan="3"><b>{{VALOR_DOADO}}</b></td>
+                </tr>
+                <tr>
+                    <td class="label">Por Extenso .........:</td>
+                    <td colspan="3"><b>{{VALOR_DOADO_EXTENSO}}</b></td>
+                </tr>
+                <tr>
+                    <td class="label">Referente a .........:</td>
+                    <td colspan="3"><b>Doação do mês de agosto</b></td>
+                </tr>
+            </table>
+        </div>
+        
+        <!-- Assinatura -->
+        <div class="signature">
+            <table width="100%">
+                <tr>
+                    <td></td>
+                    <td style="border-bottom: 1px solid black; width: 150px;">&nbsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td style="text-align: center;">Assinatura</td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+</body>
+
+</html>
