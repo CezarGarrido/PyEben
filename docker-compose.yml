@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ebenezer
+    ports:
+      - "5432:5432"  # Expondo a porta 5432 do PostgreSQL para o host
+    volumes:
+      - postgres-data:/var/lib/postgresql/data  # Volume para persistência dos dados
+      - ./pg.sql:/docker-entrypoint-initdb.d/init.sql  # Arquivo SQL de inicialização
+    networks:
+      - pgnetwork
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8083:80"  # Expondo a porta 80 do PgAdmin para o host
+    networks:
+      - pgnetwork
+
+volumes:
+  postgres-data:
+
+networks:
+  pgnetwork:
+    driver: bridge
