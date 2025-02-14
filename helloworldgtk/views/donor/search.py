@@ -1,6 +1,6 @@
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 from helloworldgtk.services.donor_service import DonorService  # Importa o serviço de doadores
 from ...models.user import User
@@ -15,15 +15,15 @@ class DonorSearchDialog(Gtk.Dialog):
         self.service = DonorService()
         self.donor_map = {}  # Dicionário para armazenar os objetos Donor
 
-        box = self.get_content_area()
-
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, margin=10)
+        
         # Campo de entrada para busca
         search_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         self.search_entry = Gtk.Entry()
         self.search_entry.set_placeholder_text("Digite o nome do doador...")
         self.search_entry.connect("changed", self.on_search_changed)
         search_box.pack_start(self.search_entry, True, True, 0)
-        box.add(search_box)
+        box.pack_start(search_box, False, False, 0)
 
         # Modelo para armazenar os doadores (ID, Nome)
         self.liststore = Gtk.ListStore(int, str, str)
@@ -31,7 +31,7 @@ class DonorSearchDialog(Gtk.Dialog):
 
         # Criando a TreeView
         self.treeview = Gtk.TreeView(model=self.liststore)
-
+        self.treeview.connect("key-press-event", self.on_treeview_key_pressed)  # Captura Enter na lista
         renderer = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn("ID", renderer, text=0)
         self.treeview.append_column(column)
@@ -44,8 +44,10 @@ class DonorSearchDialog(Gtk.Dialog):
         column = Gtk.TreeViewColumn("Telefones", renderer, text=2)
         self.treeview.append_column(column)
 
-        box.add(self.treeview)
+        box.pack_start(self.treeview, False, False, 0)
 
+        self.get_content_area().add(box)
+        
         self.show_all()
 
     def update_list(self, search_term):
@@ -72,3 +74,10 @@ class DonorSearchDialog(Gtk.Dialog):
             donor_id = model[tree_iter][0]  # Obtém o ID do doador
             return self.donor_map.get(donor_id)  # Retorna o objeto Donor completo
         return None
+    
+    def on_treeview_key_pressed(self, widget, event):
+        """ Captura o evento de tecla pressionada na TreeView. """
+        if event.keyval == Gdk.KEY_Return:  # Verifica se Enter foi pressionado
+            selected_donor = self.get_selected_donor()
+            if selected_donor:
+                self.response(Gtk.ResponseType.OK)  # Fecha o diálogo com OK

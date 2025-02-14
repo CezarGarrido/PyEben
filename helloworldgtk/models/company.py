@@ -14,10 +14,12 @@ class Company(Base):
     updated_at = Column(DateTime, default=datetime.utcnow)
     
     # Relacionamento com Users e Roles
+    
+
     appointments = relationship("Appointment", back_populates="company",  lazy="joined", cascade="all, delete-orphan")
+    donations = relationship("Donation", back_populates="company",  lazy="joined", cascade="all, delete-orphan")
 
     users = relationship("User", back_populates="company", lazy="joined")
     roles = relationship("Role", back_populates="company", lazy="joined")
     donors = relationship("Donor", back_populates="company", lazy="joined")
-
     employees = relationship("Employee", back_populates="company", cascade="all, delete-orphan")

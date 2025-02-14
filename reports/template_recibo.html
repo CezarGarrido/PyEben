@@ -8,10 +8,17 @@
     <style>
         @page {
             size: A5 landscape;
-            margin: 2mm;
+            margin: 0;
             /* Margens reduzidas */
         }
 
+        @media print{
+            @page {
+                size: a5 landscape;
+                margin: 0;
+            }
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
@@ -151,12 +158,11 @@
                         Res. N.º 05 de 02/02/04 DOU 05/02/04</td>
                 </tr>
                 <tr>
-                    <td colspan="2" style="text-align: center;">RUA 20 DE DEZEMBRO, N.º 3170, JARDIM RASSLEN, CEP
-                        79.813-280</td>
+                    <td colspan="2" style="text-align: center;">{{ENDERECO_EMPRESA}}</td>
                 </tr>
             </table>
 
-            <p>DOURADOS - MS</p>
+            <p>{{CIDADE_EMPRESA}}</p>
         </div>
 
         <div class="contact">
@@ -166,7 +172,7 @@
                     <td style="text-align: right;">CNPJ N.º 03.471.216/0001-23</td>
                 </tr>
                 <tr>
-                    <td colspan="2" style="text-align: left;">CELULARES: 67 9201-6365 / 67 9201-5508 / 67 9201-8151</td>
+                    <td colspan="2" style="text-align: left;">CELULARES: {{CONTATO_EMPRESA}}</td>
                 </tr>
             </table>
         </div>
@@ -220,7 +226,7 @@
                 </tr>
                 <tr>
                     <td class="label">Referente a:</td>
-                    <td><b>Doação do mês de agosto</b></td>
+                    <td><b>{{MENSAGEM}}</b></td>
                 </tr>
             </table>
         </div>

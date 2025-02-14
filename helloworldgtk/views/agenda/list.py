@@ -1,150 +1,162 @@
 import gi
 from datetime import datetime
+from enum import Enum
 
-from .new import NewAppointment
+from .form import EditAppointment
+from .form import NewAppointment
 from ...services.appointment_service import AppointmentService
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 from ..tab import BaseTab
 
+# Definição de Mensagens (Ações que podem ocorrer no sistema)
+class Msg(Enum):
+    LOAD_APPOINTMENTS = "load_appointments"
+    DELETE_APPOINTMENT = "delete_appointment"
+    SHOW_CONFIRMATION = "show_confirmation"
+    SHOW_ERROR = "show_error"
+    OPEN_NEW = "open_new"
+    OPEN_EDIT = "open_edit"
+
 class AgendaList(BaseTab):
     def __init__(self, app):
-        """
-        Inicializa a aba de listagem de compromissos.
-        :param app: Instância da Application, usada para obter o usuário logado.
-        """
-        self.app = app  # Guarda a instância da aplicação
+        self.app = app
         self.svc = AppointmentService()
+        self.state = {"appointments": []}  # Estado inicial
         super().__init__()
 
     def create_content(self):
-        """Cria o conteúdo da aba, que consiste em um calendário e uma lista de eventos agrupados por hora."""
+        """Cria o conteúdo da aba, incluindo o calendário e a lista de compromissos."""
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-
-        # Caixa horizontal para o calendário e lista de eventos
-        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         vbox.pack_start(hbox, True, True, 0)
 
         # Calendário
+        self.calendar_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.calendar_box.set_name("calendar-box")  # Nome para o CSS
+        hbox.pack_start(self.calendar_box, False, True, 0)
         self.calendar = Gtk.Calendar()
-        self.calendar.connect("day-selected", self.on_date_selected)  # Atualiza eventos ao mudar a data
-        hbox.pack_start(self.calendar, False, False, 0)
+        self.calendar.connect("day-selected", lambda _: self.handle_message(Msg.LOAD_APPOINTMENTS))
+        self.calendar_box.pack_start(self.calendar, False, False, 0)
 
-        # Lista de eventos com agrupamento
-        self.event_store = Gtk.TreeStore(str, str, str)  # 3 colunas: Hora/Descrição, Nome do Evento, Doador
+        # Lista de eventos
+        self.event_store = Gtk.TreeStore(str, str, str, int)
         self.event_view = Gtk.TreeView(model=self.event_store)
         self.add_columns_to_event_view()
-
-        # ScrolledWindow para a lista de eventos
         scrolled_window = Gtk.ScrolledWindow()
-        scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scrolled_window.add(self.event_view)
         hbox.pack_start(scrolled_window, True, True, 0)
 
-        # Carregar eventos do dia atual ao abrir a aba
-        self.load_appointments_for_selected_date()
-
+        self.handle_message(Msg.LOAD_APPOINTMENTS)
+        self.apply_css()
         return vbox
 
+    def apply_css(self):
+        """Aplica estilo CSS ao calendário."""
+        css = b"""
+        #calendar-box {
+            background-color: @theme_bg_color;
+            padding: 10px;
+        }
+        """
+        css_provider = Gtk.CssProvider()
+        css_provider.load_from_data(css)
+        screen = Gdk.Screen.get_default()
+        Gtk.StyleContext.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
     def add_columns_to_event_view(self):
-        """Adiciona colunas à lista de eventos com agrupamento."""
+        """Adiciona colunas ao TreeView."""
         renderer = Gtk.CellRendererText()
+        self.event_view.append_column(Gtk.TreeViewColumn("Hora / Obs.", renderer, text=0))
+        self.event_view.append_column(Gtk.TreeViewColumn("Doador", renderer, text=1))
 
-        column_desc = Gtk.TreeViewColumn("Descrição / Hora", renderer, text=0)
-        self.event_view.append_column(column_desc)
+    def handle_message(self, msg, data=None):
+        """Processa mensagens e executa ações conforme necessário."""
+        print(f"Handling message: {msg}")
+        if msg == Msg.LOAD_APPOINTMENTS:
+            print("Loading appointments...")
+            self.load_appointments()
+        elif msg == Msg.DELETE_APPOINTMENT:
+            self.delete_appointment(data)
+        elif msg == Msg.SHOW_CONFIRMATION:
+            return self.show_confirmation_dialog(data)
+        elif msg == Msg.SHOW_ERROR:
+            self.show_error_dialog(data)
+        elif msg == Msg.OPEN_NEW:
+            form = NewAppointment(self.app, self.get_toplevel())
+            form.connect("appointment_saved", lambda _, __: self.handle_message(Msg.LOAD_APPOINTMENTS))
+        elif msg == Msg.OPEN_EDIT:
+            self.edit_appointment()
 
-        column_donor = Gtk.TreeViewColumn("Doador", renderer, text=1)
-        self.event_view.append_column(column_donor)
-
-    def load_appointments_for_selected_date(self):
-        """Carrega os compromissos do banco para a data selecionada no calendário, agrupando por hora cheia."""
-        # Obtém a data selecionada no calendário
+    def load_appointments(self):
+        """Carrega compromissos para a data selecionada."""
+        print("carregando...")
         year, month, day = self.calendar.get_date()
         selected_date = datetime(year, month + 1, day).date()
+        print(f"Selected date: {selected_date}")
+        self.state["appointments"].clear()
+        self.state["appointments"] = self.svc.get_appointments_by_date(self.app.logged_user, selected_date)
+        self.update_event_view(self.state["appointments"])
 
-        print(f"Data selecionada: {selected_date}")
 
-        # Busca os compromissos na base de dados
-        appointments = self.svc.get_appointments_by_date(self.app.logged_user, selected_date)
-
-        # Limpa a árvore antes de inserir novos dados
+    def update_event_view(self, appointments):
+        """Atualiza a lista de eventos na interface."""
         self.event_store.clear()
-
-        # Agrupar compromissos por hora cheia (ex: "01:00", "02:00")
         grouped_appointments = {}
         for appointment in appointments:
-            if appointment.time:
-                full_time = appointment.time.strip()  # Exemplo: "14:35"
-                hour_exact = full_time[:2] + ":00"  # Transforma em "14:00"
-            else:
-                full_time = "Sem horário"
-                hour_exact = "Sem horário"
-
+            hour_exact = f"{appointment.time[:2]}:00" if appointment.time else "Sem horário"
             donor_name = appointment.calls.donor.name if appointment.calls else "N/A"
-            
-            print(f"Compromisso: {appointment.notes or 'Sem descrição'}, Hora: {full_time}, Grupo: {hour_exact}, Doador: {donor_name}")
-
-            if hour_exact not in grouped_appointments:
-                grouped_appointments[hour_exact] = []
-
-            grouped_appointments[hour_exact].append((full_time, appointment.notes or "Sem descrição", donor_name))
-
-        # Adiciona os dados à árvore
+            grouped_appointments.setdefault(hour_exact, []).append((appointment.time, appointment.notes or "N/A", donor_name, appointment.id))
+        
         for hour_group, events in sorted(grouped_appointments.items()):
-            print(f"Adicionando hora cheia: {hour_group}")
-            parent = self.event_store.append(None, [hour_group, "", ""])  # Nó pai com a hora cheia
-
-            # Ordena os eventos dentro do grupo por minuto
-            for full_time, event_desc, donor in sorted(events):
-                print(f"Adicionando evento: {event_desc}, Hora: {full_time}, Doador: {donor}")
-                self.event_store.append(parent, [f"🟢 {full_time} - {event_desc}", donor, ""])  # Nó filho com detalhes do compromisso
+            parent = self.event_store.append(None, [hour_group, "", "", -1])
             
+            for full_time, event_desc, donor, appointment_id in sorted(events):
+                self.event_store.append(parent, [f"🟢 {full_time} - {event_desc}", donor, "", appointment_id])
+                
             self.event_view.expand_row(self.event_store.get_path(parent), True)
+            
+    def delete_appointment(self, appointment_id):
+        """Tenta excluir um compromisso."""
+        if appointment_id == -1:
+            self.handle_message(Msg.SHOW_ERROR, "Nenhum compromisso selecionado.")
+            return
+        if self.handle_message(Msg.SHOW_CONFIRMATION, "Deseja realmente excluir este compromisso?"):
+            self.svc.deactivate(self.app.logged_user, appointment_id)
+            self.handle_message(Msg.LOAD_APPOINTMENTS)
 
+    def edit_appointment(self):
+        """Abre a tela de edição de compromisso."""
+        selection = self.event_view.get_selection()
+        model, tree_iter = selection.get_selected()
+        if tree_iter:
+            appointment_id = model[tree_iter][3]
+            if appointment_id == -1:
+                self.handle_message(Msg.SHOW_ERROR, "Nenhum compromisso selecionado.")
+                return
+            form = EditAppointment(self.app, self.get_toplevel(), appointment_id)
+            form.connect("appointment_saved", lambda _, __: self.handle_message(Msg.LOAD_APPOINTMENTS))
+        else:
+            self.handle_message(Msg.SHOW_ERROR, "Nenhum compromisso selecionado.")
 
     def get_toolbar_actions(self):
         """Define os botões da toolbar."""
         return [
-            ("new", "document-new", "Novo", self.on_new_clicked),
-            ("edit", "document-edit", "Editar", self.on_edit_clicked),
-            ("delete", "edit-delete", "Desativar", self.on_delete_clicked),
-            None,  # Separador
-            ("close", "window-close", "Fechar", self.on_close_clicked),
+            ("new", "document-new", "Novo", lambda _: self.handle_message(Msg.OPEN_NEW)),
+            ("edit", "document-edit", "Editar", lambda _: self.handle_message(Msg.OPEN_EDIT)),
+            ("delete", "edit-delete", "Excluir", lambda _: self.handle_message(Msg.DELETE_APPOINTMENT, self.get_selected_appointment_id())),
+            None,
+            ("close", "window-close", "Fechar", lambda _: self.destroy()),
         ]
+
+    def get_selected_appointment_id(self):
+        """Retorna o ID do compromisso selecionado."""
+        selection = self.event_view.get_selection()
+        model, tree_iter = selection.get_selected()
+        return model[tree_iter][3] if tree_iter else -1
     
-    def on_date_selected(self, calendar):
-        """Atualiza a lista de eventos ao selecionar uma nova data no calendário."""
-        self.load_appointments_for_selected_date()
-
-    def on_new_clicked(self, action):
-        """Abre a tela de novo compromisso."""
-        form = NewAppointment(self.app, self.get_toplevel())
-
-    def on_edit_clicked(self, action):
-        """Edita o compromisso selecionado."""
-        selection = self.event_view.get_selection()
-        model, tree_iter = selection.get_selected()
-        if tree_iter:
-            appointment_id = model[tree_iter][0]  # Obtém o ID do compromisso
-            print(f"Editar compromisso ID {appointment_id}")  # Implementar edição depois
-
-    def on_delete_clicked(self, action):
-        """Deleta o compromisso selecionado."""
-        selection = self.event_view.get_selection()
-        model, tree_iter = selection.get_selected()
-        if tree_iter:
-            appointment_id = model[tree_iter][0]
-            confirm = self.show_confirmation_dialog("Deseja realmente excluir este compromisso?")
-            if confirm:
-                self.svc.delete_appointment(appointment_id)
-                self.load_appointments_for_selected_date()
-
-    def on_close_clicked(self, action):
-        """Fecha a aba de agenda."""
-        self.get_toplevel().destroy()
-
     def show_confirmation_dialog(self, message):
         """Exibe um diálogo de confirmação e retorna True se o usuário confirmar."""
         dialog = Gtk.MessageDialog(
@@ -157,3 +169,15 @@ class AgendaList(BaseTab):
         response = dialog.run()
         dialog.destroy()
         return response == Gtk.ResponseType.YES
+    
+    def show_error_dialog(self, message):
+        dialog = Gtk.MessageDialog(
+            transient_for=self.get_toplevel(),
+            flags=Gtk.DialogFlags.MODAL,
+            message_type=Gtk.MessageType.ERROR,
+            buttons=Gtk.ButtonsType.CLOSE,
+            text="Erro!",
+        )
+        dialog.format_secondary_text(message)
+        dialog.run()
+        dialog.destroy()

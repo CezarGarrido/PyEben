@@ -29,9 +29,9 @@ class LoginWindow(Gtk.Window):
 
         # Cria os widgets
         self.username_entry = Gtk.Entry()
-        self.username_entry.set_placeholder_text("Username")
+        self.username_entry.set_placeholder_text("Usuário")
         self.password_entry = Gtk.Entry()
-        self.password_entry.set_placeholder_text("Password")
+        self.password_entry.set_placeholder_text("Senha")
         self.password_entry.set_visibility(False)
         self.password_entry.connect("activate", self.on_login_button_clicked)
 
@@ -45,9 +45,9 @@ class LoginWindow(Gtk.Window):
 
         # Adiciona os widgets ao Grid
         grid.attach(welcome_label, 0, 0, 2, 1)  # Ocupa duas colunas para centralizar o título
-        grid.attach(Gtk.Label(label="Username:"), 0, 1, 1, 1)
+        grid.attach(Gtk.Label(label="Usuário:"), 0, 1, 1, 1)
         grid.attach(self.username_entry, 1, 1, 1, 1)
-        grid.attach(Gtk.Label(label="Password:"), 0, 2, 1, 1)
+        grid.attach(Gtk.Label(label="Senha:"), 0, 2, 1, 1)
         grid.attach(self.password_entry, 1, 2, 1, 1)
         grid.attach(login_button, 0, 3, 2, 1)  # Ocupa duas colunas para centralizar o botão
 
@@ -66,14 +66,12 @@ class LoginWindow(Gtk.Window):
             self.show_error_dialog(f"Ocorreu um erro ao tentar fazer login: {str(e)}")
 
     def show_error_dialog(self, message):
-        
-        print(message)
         dialog = Gtk.MessageDialog(
             transient_for=self,
             flags=Gtk.DialogFlags.MODAL,
             message_type=Gtk.MessageType.ERROR,
             buttons=Gtk.ButtonsType.CLOSE,
-            text="Login failed!",
+            text="Falha!",
         )
         dialog.format_secondary_text(message)
         dialog.run()

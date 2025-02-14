@@ -102,7 +102,6 @@ class EditForm(Gtk.Window):
         employee.rg_issuer = self.rg_issuer_entry.get_text()
         employee.position = self.position_entry.get_text()
         employee.department = self.department_entry.get_text()
-        employee.salary = float(self.salary_entry.get_text().replace("R$", "").replace(".", "").replace(",", ".")) if self.salary_entry.get_text() else None
         employee.hire_date = datetime.datetime.strptime(self.hire_date_entry.get_text(), "%d/%m/%Y").date() if self.hire_date_entry.get_text() else None
         employee.termination_date = datetime.datetime.strptime(self.termination_date_entry.get_text(), "%d/%m/%Y").date() if self.termination_date_entry.get_text() else None
         
@@ -114,6 +113,21 @@ class EditForm(Gtk.Window):
         employee.addresses.postal_code = self.postal_code_entry.get_text()
         employee.addresses.number = self.number_entry.get_text()
         
+
+        amount_text = self.salary_entry.get_text().strip()
+
+        # Remove "R$" e espaços
+        amount_text = amount_text.replace("R$", "").replace(" ", "")
+
+        # Remove apenas pontos que são separadores de milhar (não o ponto decimal)
+        amount_text = re.sub(r"\.(?=\d{3}(,|$))", "", amount_text)
+
+        # Substitui a vírgula decimal por ponto
+        amount_text = amount_text.replace(",", ".")
+
+        # Converte para float
+        employee.salary = float(amount_text)
+
         contacts = []
         for row in self.contacts_store:
             contacts.append(EmployeeContact(name=row[0], phone=row[1], email=row[2]))

@@ -1,4 +1,4 @@
-from sqlalchemy import TEXT, CheckConstraint, Column, BigInteger, String, ForeignKey, DateTime, TIMESTAMP
+from sqlalchemy import TEXT, Boolean, CheckConstraint, Column, BigInteger, String, ForeignKey, DateTime, TIMESTAMP
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -14,13 +14,15 @@ class Appointment(Base):
     time = Column(String(20), nullable=True)
     event_type = Column(String(20), nullable=False, default='Ligação')
     notes = Column(String(255), nullable=True)
+    active = Column(Boolean, default=True)
 
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
     updated_at = Column(TIMESTAMP, server_default=func.current_timestamp(), onupdate=func.current_timestamp())
 
     company = relationship("Company", back_populates="appointments")
     calls = relationship("AppointmentCall", back_populates="appointment", uselist=False, cascade="all, delete-orphan")
-    
+    donation = relationship("Donation", back_populates="appointment", uselist=False, cascade="all, delete-orphan")
+
     __table_args__ = (
         CheckConstraint("event_type = 'Ligação'"),
     )

@@ -2,14 +2,43 @@
 
 from argparse import ArgumentParser
 from platform import system
+import pkgutil
+import reportlab.graphics.barcode
 
 parser = ArgumentParser()
 parser.add_argument("--binary", action="store_true")
 options = parser.parse_args()
 
-datas = []
+gtk_data_dirs = [
+    ("/usr/share/gtk-3.0", "gtk-3.0/"),
+    ("/usr/share/themes", "themes/"),
+    ("/usr/share/icons", "icons/"),
+]
+
+datas = [
+    ('reports/template_recibo.html', 'reports/'),
+    *[(src, dst) for src, dst in gtk_data_dirs if os.path.exists(src)]
+]
+
+
 binaries = []
-hiddenimports = ["cairo", "gi.repository.Poppler"]
+hiddenimports = [
+    "cairo",
+    "gi.repository.Gtk",
+    "gi.repository.Gdk",
+    "gi.repository.GdkPixbuf",
+    "gi.repository.Pango",
+    "gi.repository.Cairo",
+    "gi.repository.GObject",
+    "gi.repository.GLib",
+    "gi.repository.Gio",
+    "gi.repository.Gtk.PrintOperation",
+    "gi.repository.Poppler",
+    "reportlab.graphics.barcode",
+
+    *[f"reportlab.graphics.barcode.{name}" for _, name, _ in pkgutil.iter_modules(reportlab.graphics.barcode.__path__)]
+]
+
 
 if system() == "Linux":
     datas.append(("/usr/lib/x86_64-linux-gnu/girepository-1.0/Poppler-0.18.typelib", "."))

@@ -11,7 +11,7 @@ class Application(Gtk.Application):
         self.main_window = None
         self.login_window = None
         self.logged_user = None  # Variável para armazenar o usuário logado
-
+        
     def on_login_success(self, login_window, user):
         print("Login bem-sucedido! Abrindo a janela principal...")
         self.logged_user = user  # Salva o usuário logado na aplicação

@@ -108,7 +108,8 @@ class UserList(BaseTab):
             print("Nenhum usuário encontrado no banco de dados.")
             
     def on_save_clicked(self, action): print("Salvar")
-    def on_close_clicked(self, action): print("Fechar")
+    def on_close_clicked(self, action):
+        self.destroy()
 
     def on_new_clicked(self, action):
         form = NewForm(self.app, self.get_toplevel())
