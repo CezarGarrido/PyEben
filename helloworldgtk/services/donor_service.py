@@ -1,4 +1,4 @@
-from sqlalchemy import or_
+from sqlalchemy import String, cast, desc, func, or_
 from sqlalchemy.orm import Session
 from ..models.donor import Donor, DonorContact
 from ..database import Session
@@ -29,7 +29,7 @@ class DonorService:
         :param user: Usuário autenticado que está fazendo a requisição.
         :return: Lista de instâncias de User da mesma empresa.
         """
-        return self.db.query(Donor).filter(Donor.company_id == user.company_id).all()
+        return self.db.query(Donor).filter(Donor.company_id == user.company_id).order_by(desc(Donor.id)).all()
 
     def get_by_id(self, user: User, user_id: int):
         """
@@ -62,17 +62,33 @@ class DonorService:
             self.db.commit()
             return True
         return False
+
+    def search(self, user: User, search_term: str, offset=0, limit=10):
+        """
+        Busca doadores da mesma empresa, permitindo pesquisa por nome e ID,
+        mesmo quando search_term contém números e texto misturados.
+        """
+        query = self.db.query(Donor).filter(Donor.company_id == user.company_id)
+
+        if search_term:
+            query = query.filter(or_(
+                Donor.name.ilike(f"%{search_term}%"),
+                cast(Donor.id, String).ilike(f"%{search_term}%")  # Converte ID para texto
+            ))
+
+        return query.order_by(desc(Donor.id)).offset(offset).limit(limit).all()
     
-    def search(self, user: User, search_term: str):
+    def count(self, user: User, search_term: str = ""):
         """
-        Busca doadores pelo nome ou parte do nome dentro da mesma empresa do usuário autenticado.
-        :param user: Usuário autenticado que está fazendo a requisição.
-        :param search_term: Termo de busca a ser utilizado.
-        :return: Lista de doadores correspondentes.
+        Retorna o número total de doadores que pertencem à empresa do usuário.
+        Se um termo de busca for fornecido, conta apenas os doadores correspondentes.
         """
-        return self.db.query(Donor).filter(
-            Donor.company_id == user.company_id,
-            or_(
-                Donor.name.ilike(f"%{search_term}%")
-            )
-        ).all()
+        query = self.db.query(func.count(Donor.id)).filter(Donor.company_id == user.company_id)
+
+        if search_term:
+            query = query.filter(or_(
+                Donor.name.ilike(f"%{search_term}%"),
+                cast(Donor.id, String).ilike(f"%{search_term}%")  # Busca por ID convertido em texto
+            ))
+
+        return query.scalar()

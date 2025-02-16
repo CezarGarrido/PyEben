@@ -3,11 +3,17 @@ require_versions({"Gtk": "3.0"})
 from gi.repository import Gtk
 from .window import Window
 from .login import LoginWindow  # Importa a classe LoginWindow do arquivo login.py
+from .migrate import run_migrations
+
+
+
 
 class Application(Gtk.Application):
 
     def __init__(self):
         super().__init__()
+        run_migrations()
+
         self.main_window = None
         self.login_window = None
         self.logged_user = None  # Variável para armazenar o usuário logado

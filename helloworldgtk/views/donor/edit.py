@@ -69,7 +69,7 @@ class EditForm(Gtk.Window):
         self.rg_issuer_entry.set_text(donor.rg_issuer)
 
         if donor.addresses:
-            self.postal_code_entry.set_text(donor.addresses.postal_code)
+            self.postal_code_entry.set_text(donor.addresses.postal_code or "")
             self.city_entry.set_text(donor.addresses.city)
             self.state_entry.set_text(donor.addresses.state)
             self.street_entry.set_text(donor.addresses.street)

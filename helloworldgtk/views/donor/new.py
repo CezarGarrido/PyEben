@@ -46,6 +46,9 @@ class NewForm(Gtk.Window):
         button.connect("clicked", self.on_save_clicked)
         vbox.pack_start(button, False, False, 0)
 
+        
+        GObject.idle_add(self.update_fields_visibility)
+
     def create_personal_tab(self):
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5, margin=10)
         
@@ -63,7 +66,8 @@ class NewForm(Gtk.Window):
         self.cpf_entry = self.v.add("CPF:", validate_cpf, format_cpf)
         self.cnpj_entry = self.v.add("CNPJ:")
         self.ie_entry = self.v.add("Inscrição Estadual:")
-
+        self.cnpj_entry.set_visible(False)
+        self.ie_entry.set_visible(False)
         # RG e Órgão Emissor
         self.rg_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
         self.rg_entry = self.v.add("RG:")
@@ -80,8 +84,7 @@ class NewForm(Gtk.Window):
         box.pack_start(self.rg_box, False, False, 0)
         box.pack_start(self.cnpj_entry, False, False, 0)
         box.pack_start(self.ie_entry, False, False, 0)
-        self.update_fields_visibility()
-
+      
         return box
     
     def on_person_type_changed(self, combo):
@@ -97,6 +100,7 @@ class NewForm(Gtk.Window):
         self.cnpj_entry.set_visible(not is_fisica)
         self.ie_entry.set_visible(not is_fisica)
 
+    
     def on_key_press(self, widget, event):
         """Detecta teclas pressionadas no Gtk.Calendar."""
         if event.keyval == Gdk.KEY_Return:

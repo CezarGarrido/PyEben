@@ -30,7 +30,7 @@ class BaseDonationForm(Gtk.Window):
 
         self.selected_donor = None
         self.donation = None
-
+        self.is_appointment = False
         self.init_ui()
 
     def init_ui(self):
@@ -128,6 +128,7 @@ class BaseDonationForm(Gtk.Window):
 class NewForm(BaseDonationForm):
     __gsignals__ = {
         "donation_saved": (GObject.SignalFlags.RUN_FIRST, None, (int,)),
+        "complete_donation": (GObject.SignalFlags.RUN_FIRST, None, (object,))
     }
 
     def __init__(self, app, parent):
@@ -153,6 +154,13 @@ class NewForm(BaseDonationForm):
             received_at=received_at,
             received_time=received_time,
         )
+        
+        if self.is_appointment:
+            print("Doação criada dentro do compromisso, retornando sem salvar no banco.")
+            self.emit("complete_donation", self.donation)
+
+            self.destroy()  # Fecha o formulário
+            return  # Apenas retorna, sem salvar no banco
 
         try:
             donation_service = DonationService()
@@ -163,7 +171,15 @@ class NewForm(BaseDonationForm):
         except Exception as e:
             self.show_error(f"Erro ao salvar doação: {e}")
 
-
+    def from_appointment(self, appointment):
+        """
+        Ativa o modo de compromisso e cria uma doação sem salvar no banco.
+        """
+        self.is_appointment = True
+        self.selected_donor = appointment.calls.donor
+        self.donor_entry.set_text(self.selected_donor.name)
+        self.donor_entry.entry.set_sensitive(False)  # Bloqueia edição do doador
+        
 class EditForm(BaseDonationForm):
     __gsignals__ = {
         "donation_updated": (GObject.SignalFlags.RUN_FIRST, None, (int,)),

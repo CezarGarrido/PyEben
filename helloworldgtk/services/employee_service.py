@@ -9,19 +9,25 @@ class EmployeeService:
 
     def create_employee(self, user: User, new_employee: Employee):
         """
-        Cria um novo usuário na mesma empresa do usuário autenticado.
+        Cria um novo funcionário na mesma empresa do usuário autenticado.
         :param user: Usuário autenticado que está fazendo a requisição.
-        :param new_user: Objeto User contendo os dados do novo usuário.
-        :return: ID do novo usuário criado.
+        :param new_employee: Objeto Employee contendo os dados do novo funcionário.
+        :return: ID do novo funcionário criado.
         """
-        new_employee.company_id = user.company_id  # Garante que o novo usuário pertença à mesma empresa
-        new_employee.user_creator_id = user.id  # Registra o criador do usuário
+        new_employee.company_id = user.company_id  # Garante que o novo funcionário pertença à mesma empresa
+        new_employee.user_creator_id = user.id  # Registra o criador do funcionário
+
+        # Verifica se new_employee possui uma lista de users e atualiza cada um deles
+        if hasattr(new_employee, "users") and isinstance(new_employee.users, list):
+            for user_obj in new_employee.users:
+                user_obj.company_id = user.company_id
+                user_obj.user_creator_id = user.id
 
         self.db.add(new_employee)
         self.db.commit()
         self.db.refresh(new_employee)
         return new_employee.id
-    
+
     def list(self, user: User):
         """
         Lista todos os usuários da mesma empresa do usuário fornecido.

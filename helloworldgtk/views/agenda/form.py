@@ -6,7 +6,7 @@ from helloworldgtk.services.appointment_service import AppointmentService
 from helloworldgtk.views.donor.search import DonorSearchDialog
 from helloworldgtk.widget.pdf_viewer import PDFViewer
 from helloworldgtk.widget.validate_entry import FormValidator
-from helloworldgtk.views.donation.new import NewForm as DonationNewForm
+from helloworldgtk.views.donation.form import NewForm as DonationNewForm
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')

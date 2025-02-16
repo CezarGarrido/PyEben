@@ -1,5 +1,4 @@
 import gi
-from datetime import datetime
 from enum import Enum
 
 from .form import EditAppointment
@@ -8,6 +7,7 @@ from ...services.appointment_service import AppointmentService
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk
+from datetime import datetime, timedelta
 
 from ..tab import BaseTab
 
@@ -38,20 +38,72 @@ class AgendaList(BaseTab):
         self.calendar_box.set_name("calendar-box")  # Nome para o CSS
         hbox.pack_start(self.calendar_box, False, True, 0)
         self.calendar = Gtk.Calendar()
-        self.calendar.connect("day-selected", lambda _: self.handle_message(Msg.LOAD_APPOINTMENTS))
+        self.calendar.connect("day-selected", self.on_calendar_date_selected)
         self.calendar_box.pack_start(self.calendar, False, False, 0)
 
         # Lista de eventos
+        
+        # Lista de eventos e Toolbar
+        event_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        hbox.pack_start(event_box, True, True, 0)
+        
+        self.toolbar = Gtk.Toolbar()
+        event_box.pack_start(self.toolbar, False, False, 0)
+        
+        self.prev_button = Gtk.ToolButton.new_from_stock(Gtk.STOCK_GO_BACK)
+        self.prev_button.connect("clicked", self.on_prev_clicked)
+
+        self.toolbar.insert(self.prev_button, 0)
+        
+        self.date_label = Gtk.Label(label="")
+        self.update_date_label()
+        tool_item = Gtk.ToolItem()
+        tool_item.add(self.date_label)
+        self.toolbar.insert(tool_item, 2)
+        
+        self.next_button = Gtk.ToolButton.new_from_stock(Gtk.STOCK_GO_FORWARD)
+        self.next_button.connect("clicked", self.on_next_clicked)
+
+        self.toolbar.insert(self.next_button, 3)
+        
         self.event_store = Gtk.TreeStore(str, str, str, int)
         self.event_view = Gtk.TreeView(model=self.event_store)
         self.add_columns_to_event_view()
+        
         scrolled_window = Gtk.ScrolledWindow()
         scrolled_window.add(self.event_view)
-        hbox.pack_start(scrolled_window, True, True, 0)
+        event_box.pack_start(scrolled_window, True, True, 0)
+        
 
         self.handle_message(Msg.LOAD_APPOINTMENTS)
         self.apply_css()
         return vbox
+    
+    def on_prev_clicked(self, widget):
+        """Retrocede um dia no calendário e atualiza a interface."""
+        year, month, day = self.calendar.get_date()
+        current_date = datetime(year, month + 1, day)
+        new_date = current_date - timedelta(days=1)
+        self.calendar.select_day(new_date.day)
+        self.calendar.select_month(new_date.month - 1, new_date.year)
+        self.update_date_label()
+        self.handle_message(Msg.LOAD_APPOINTMENTS)
+
+    def on_next_clicked(self, widget):
+        """Avança um dia no calendário e atualiza a interface."""
+        year, month, day = self.calendar.get_date()
+        current_date = datetime(year, month + 1, day)
+        new_date = current_date + timedelta(days=1)
+        self.calendar.select_day(new_date.day)
+        self.calendar.select_month(new_date.month - 1, new_date.year)
+        self.update_date_label()
+        self.handle_message(Msg.LOAD_APPOINTMENTS)
+
+    def update_date_label(self):
+        """Atualiza o texto da label de data com a data atualmente selecionada."""
+        year, month, day = self.calendar.get_date()
+        selected_date = datetime(year, month + 1, day)
+        self.date_label.set_text(selected_date.strftime("%d de %B de %Y"))
 
     def apply_css(self):
         """Aplica estilo CSS ao calendário."""
@@ -71,7 +123,13 @@ class AgendaList(BaseTab):
         renderer = Gtk.CellRendererText()
         self.event_view.append_column(Gtk.TreeViewColumn("Hora / Obs.", renderer, text=0))
         self.event_view.append_column(Gtk.TreeViewColumn("Doador", renderer, text=1))
-
+        
+    def on_calendar_date_selected(self, widget):
+        
+        """Atualiza a label da data ao selecionar um novo dia no calendário."""
+        self.update_date_label()
+        self.handle_message(Msg.LOAD_APPOINTMENTS)
+        
     def handle_message(self, msg, data=None):
         """Processa mensagens e executa ações conforme necessário."""
         print(f"Handling message: {msg}")
@@ -114,7 +172,7 @@ class AgendaList(BaseTab):
             parent = self.event_store.append(None, [hour_group, "", "", -1])
             
             for full_time, event_desc, donor, appointment_id in sorted(events):
-                self.event_store.append(parent, [f"🟢 {full_time} - {event_desc}", donor, "", appointment_id])
+                self.event_store.append(parent, [f"{full_time} - {event_desc}", donor, "", appointment_id])
                 
             self.event_view.expand_row(self.event_store.get_path(parent), True)
             

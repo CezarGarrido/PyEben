@@ -130,8 +130,26 @@ class DonationListForm(BaseTab):
 
     def on_donation_saved(self, w, donation_id):
         print(f"Doação salva com ID: {donation_id}")
-
-                
+        service = DonationService()
+        donation = service.get_by_id(self.app.logged_user, donation_id)
+        
+        
+        if donation.paid:
+            # Criar um diálogo perguntando se deseja gerar o recibo
+            dialog = Gtk.MessageDialog(
+                transient_for=self.get_toplevel(),
+                flags=Gtk.DialogFlags.MODAL,
+                message_type=Gtk.MessageType.QUESTION,
+                buttons=Gtk.ButtonsType.YES_NO,
+                text="Recibo",
+            )
+            dialog.format_secondary_text("Deseja gerar um recibo para esta doação?")
+            response = dialog.run()
+            dialog.destroy()
+            if response == Gtk.ResponseType.YES:
+                pdf_path = service.generate_receipt(self.app.logged_user, donation_id)
+                v = PDFViewer(self.app, self.get_toplevel(), pdf_path)
+                    
         self.load_donations()
          
     def on_generate_receipt(self, action):

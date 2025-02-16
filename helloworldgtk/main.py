@@ -1,3 +1,4 @@
+import os
 from .application import Application
 from .models.base import Base
 import logging
@@ -5,9 +6,12 @@ import structlog
 import json
 from logging.handlers import TimedRotatingFileHandler
 
+log_dir = "logs"
+os.makedirs(log_dir, exist_ok=True)  # Garante que a pasta existe
+
 # Configuração do handler para rotação diária
 log_handler = TimedRotatingFileHandler(
-    filename="log-ebenezer",  # Nome base do arquivo
+    filename=os.path.join(log_dir, "log"),  # Caminho do log
     when="m",    # Rotação diária
     interval=1,         # A cada 1 dia
     backupCount=7,      # Mantém os últimos 7 dias de logs
@@ -47,14 +51,5 @@ structlog.configure(
 )
 
 def main(argv):
-    # Criando o logger
-    log = structlog.get_logger()
-
-    # Testando logs
-    log.info("Aplicação iniciada", usuario="admin", status="sucesso")
-    log.warning("Aviso importante", usuario="system")
-    log.error("Erro crítico", erro="Falha no sistema")
-
-    print("Log gravado!")
     app = Application()
     app.run(argv)

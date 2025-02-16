@@ -18,7 +18,7 @@ class Window(Gtk.ApplicationWindow):
         super().__init__(application=app)
         self.app = app  # Referência para a aplicação principal
         self.set_title("Ebenezer")
-        self.set_default_size(800, 600)
+        self.set_default_size(850, 600)
         self.set_position(Gtk.WindowPosition.CENTER)
         self.font_size = 14
         # Cria uma caixa vertical para a janela

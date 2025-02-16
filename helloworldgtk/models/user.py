@@ -1,31 +1,39 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
+from sqlalchemy import Column, BigInteger, String, Boolean, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
-import bcrypt
-
 from .base import Base
-from .role import Role
-from .company import Company
+import bcrypt
 
 class User(Base):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    company_id = Column(Integer, ForeignKey('companies.id'), nullable=False)
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    company_id = Column(BigInteger, ForeignKey('companies.id'), nullable=False)
+
+    # 🔹 Vincula o usuário a um funcionário
+    employee_id = Column(BigInteger, ForeignKey('employees.id', ondelete="SET NULL"), nullable=True)
+
     username = Column(String(255), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, nullable=False)
     active = Column(Boolean, default=True)
     photo = Column(String(255), nullable=True)
-    role_id = Column(Integer, ForeignKey('roles.id'))
-    user_creator_id = Column(Integer, ForeignKey('users.id'), nullable=True)  # Referência ao criador do usuário
+    role_id = Column(BigInteger, ForeignKey('roles.id'))
+
+    # 🔹 Especificamos explicitamente a chave estrangeira correta para evitar erro
+    user_creator_id = Column(BigInteger, ForeignKey('users.id', ondelete="SET NULL"), nullable=True)
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     role = relationship("Role", back_populates="users")
     company = relationship("Company", back_populates="users")
-    creator = relationship("User", remote_side=[id], backref="created_users")  # Relacionamento recursivo
+
+    # 🔹 Corrigimos o erro especificando `foreign_keys`
+    creator = relationship("User", remote_side=[id], backref="created_users")
+    
+    # 🔹 Aqui especificamos que `employee_id` é a chave a ser usada no relacionamento
+    employee = relationship("Employee", back_populates="users", foreign_keys=[employee_id])
     
     @staticmethod
     def hash_password(plain_password: str) -> str:

@@ -3,7 +3,9 @@ from sqlalchemy import (
 )
 import sqlalchemy
 from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.orm import relationship
+
+from helloworldgtk.models.user import User
 
 from .base import Base
 
@@ -28,7 +30,7 @@ class Employee(Base):
     marital_status = Column(String(255))
     wife_name = Column(String(255))
     wife_date_of_birth = Column(Date)
-    user_creator_id = Column(BigInteger, ForeignKey('users.id'), nullable=False)
+    user_creator_id = Column(BigInteger, ForeignKey('users.id', ondelete="SET NULL", use_alter=True), nullable=True)
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
     updated_at = Column(TIMESTAMP, server_default=func.current_timestamp(), onupdate=func.current_timestamp())
     deleted_at = Column(TIMESTAMP, nullable=True)
@@ -36,7 +38,9 @@ class Employee(Base):
     contacts = relationship("EmployeeContact", back_populates="employee", cascade="all, delete-orphan")
     addresses = relationship("EmployeeAddress", back_populates="employee", uselist=False, cascade="all, delete-orphan")
     company = relationship("Company", back_populates="employees")
-
+    
+    users = relationship("User", back_populates="employee", uselist=False, foreign_keys=[User.employee_id])
+            
 class EmployeeContact(Base):
     __tablename__ = 'employee_contacts'
 

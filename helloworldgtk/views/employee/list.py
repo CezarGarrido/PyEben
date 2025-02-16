@@ -5,8 +5,8 @@ from gi.repository import Gtk
 from ...services.employee_service import EmployeeService  # Certifique-se de que o caminho está correto
 
 from ..tab import BaseTab
-from .new import NewForm
-from .edit import EditForm
+from .form import NewForm
+from .form import EditForm
 
 class EmployeeListForm(BaseTab):
     def __init__(self, app):
@@ -111,7 +111,7 @@ class EmployeeListForm(BaseTab):
 
     def on_new_clicked(self, action):
         form = NewForm(self.app, self.get_toplevel())
-        form.connect("employee_added", lambda _, user_id: self.load_users())
+        form.connect("employee_saved", lambda _, user_id: self.load_users())
 
         form.show_all()
 
@@ -168,7 +168,7 @@ class EmployeeListForm(BaseTab):
         if tree_iter:
             user_id = model[tree_iter][0]  # Obtém o ID do usuário
             edit_form = EditForm(self.app, self.get_toplevel(), user_id)  # Abre a janela de edição
-            edit_form.connect("employee_updated", lambda _, user_id: self.load_users())
+            edit_form.connect("employee_saved", lambda _, user_id: self.load_users())
             edit_form.show_all()
         else:
             self.show_error_dialog("Nenhum usuário selecionado.")

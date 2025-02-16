@@ -35,7 +35,7 @@ hiddenimports = [
     "gi.repository.Gtk.PrintOperation",
     "gi.repository.Poppler",
     "reportlab.graphics.barcode",
-
+    "logging.config",
     *[f"reportlab.graphics.barcode.{name}" for _, name, _ in pkgutil.iter_modules(reportlab.graphics.barcode.__path__)]
 ]
 
@@ -72,6 +72,8 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
+        ("alembic.ini", "."),  # Inclui o arquivo de configuração do Alembic
+        ("alembic/", "alembic/"),  # Inclui a pasta de migrações
         ('LICENSE', '.')  # Adiciona o arquivo LICENSE
     ] + datas,
     hiddenimports=hiddenimports,
