@@ -78,6 +78,35 @@ jobs:
           name: windows-dist
           path: dist/
 
+  build-windows-32:
+    name: Build for Windows 32-bit
+    runs-on: windows-2019
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python 32-bit
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          architecture: 'x86'
+      - name: Install dependencies
+        run: |
+          ./windows/bootstrap.sh
+      - name: Set up environment
+        run: |
+          copy .env.ci .env
+      - name: Build package
+        run: |
+          python build.py
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-32-dist
+          path: dist/
+
   github-release:
     name: GitHub Release
     needs: [build-linux, build-windows]
@@ -95,6 +124,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: windows-dist
+          path: dist/
+      - name: Download Windows 32-bit dist
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-32-dist
           path: dist/
       - name: Create GitHub Release
         env:
