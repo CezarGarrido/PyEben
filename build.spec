@@ -3,7 +3,6 @@
 from argparse import ArgumentParser
 from platform import system
 import pkgutil
-import reportlab.graphics.barcode
 
 parser = ArgumentParser()
 parser.add_argument("--binary", action="store_true")
@@ -34,10 +33,7 @@ hiddenimports = [
     "gi.repository.Gio",
     "gi.repository.Gtk.PrintOperation",
     "gi.repository.Poppler",
-    "reportlab",
-    "reportlab.graphics.barcode",
-    "logging.config",
-    *[f"reportlab.graphics.barcode.{name}" for _, name, _ in pkgutil.iter_modules(reportlab.graphics.barcode.__path__)]
+    "logging.config"
 ]
 
 
