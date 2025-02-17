@@ -83,18 +83,19 @@ jobs:
     runs-on: windows-2019
     defaults:
       run:
-        shell: cmd
+        shell: msys2 {0}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Set up Python 32-bit
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.12.8'
           architecture: 'x86'
       - name: Install dependencies
         run: |
           ./windows/bootstrap.sh
+          python3 -m pip install --upgrade pip setuptools
       - name: Set up environment
         run: |
           copy .env.ci .env
