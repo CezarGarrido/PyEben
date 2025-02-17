@@ -5,8 +5,8 @@ pacman -S --noconfirm \
     mingw-w64-$(uname -m)-python-setuptools \
     mingw-w64-$(uname -m)-python3-gobject \
     mingw-w64-$(uname -m)-poppler \
-    mingw-w64-$(uname -m)-libjpeg-turbo \
     mingw-w64-$(uname -m)-zlib \
+    mingw-w64-$(uname -m)-libjpeg-turbo \
     mingw-w64-$(uname -m)-libtiff \
     mingw-w64-$(uname -m)-freetype \
     mingw-w64-$(uname -m)-lcms2 \
