@@ -34,6 +34,7 @@ hiddenimports = [
     "gi.repository.Gio",
     "gi.repository.Gtk.PrintOperation",
     "gi.repository.Poppler",
+    "reportlab",
     "reportlab.graphics.barcode",
     "logging.config",
     *[f"reportlab.graphics.barcode.{name}" for _, name, _ in pkgutil.iter_modules(reportlab.graphics.barcode.__path__)]
