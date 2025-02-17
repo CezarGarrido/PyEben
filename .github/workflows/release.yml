@@ -58,7 +58,6 @@ jobs:
         run: |
           ./windows/bootstrap.sh
           python3 -m pip install --upgrade pip setuptools wheel
-          python3 -m pip install reportlab
       - name: List Installed Packages
         run: |
           pacman -Q | grep poppler
