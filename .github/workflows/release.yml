@@ -57,6 +57,7 @@ jobs:
       - name: Install dependencies
         run: |
           ./windows/bootstrap.sh
+          python3 -m pip install --upgrade pip setuptools wheel
       - name: List Installed Packages
         run: |
           pacman -Q | grep poppler
