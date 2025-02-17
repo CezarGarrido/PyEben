@@ -5,7 +5,6 @@ from ..models.donation import Donation
 from ..database import Session
 from ..models.user import User
 from pathlib import Path
-from xhtml2pdf import pisa
 import tempfile
 import sys
 import os
@@ -115,16 +114,12 @@ class DonationService:
             temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
 
             # Convertendo o HTML para PDF e salvando no arquivo temporário
-            pisa_status = pisa.CreatePDF(html_content, dest=temp_pdf)
 
             # Fechando o arquivo temporário para garantir que ele está salvo
             temp_pdf.close()
 
             # Retornando o caminho do arquivo PDF gerado se não houver erro
-            if pisa_status.err == 0:
-                return temp_pdf.name
-            else:
-                return None  # Retorna None se houver erro
+            return None
 
         except Exception as e:
             print(f"Erro ao gerar recibo: {e}")

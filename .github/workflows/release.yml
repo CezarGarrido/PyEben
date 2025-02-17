@@ -24,7 +24,6 @@ jobs:
           sudo ./linux/bootstrap.sh
           python3 -m pip install pycairo
           python3 -m pip install PyGObject
-          python3 -m pip install reportlab
       - name: Set up environment
         run: |
           cp .env.ci .env
@@ -91,6 +90,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12.8'
+          architecture: x86
       - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
         with:
