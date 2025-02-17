@@ -148,7 +148,7 @@ class Build:
         )
         requirements = join(self.srcdir, "requirements.txt")
         self._run_command(
-            f"{self.py} -m pip install -r {requirements}",
+            f"{self.py} -m pip install --only-binary=pillow -r {requirements}",
             self.logger.info
         )
         self.logger.debug(f"Set up virtual environment: {venv}")
