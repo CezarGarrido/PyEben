@@ -5,9 +5,6 @@ from .window import Window
 from .login import LoginWindow  # Importa a classe LoginWindow do arquivo login.py
 from .migrate import run_migrations
 
-
-
-
 class Application(Gtk.Application):
 
     def __init__(self):

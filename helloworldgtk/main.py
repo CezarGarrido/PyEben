@@ -1,6 +1,5 @@
 import os
 from .application import Application
-from .models.base import Base
 import logging
 import structlog
 import json
