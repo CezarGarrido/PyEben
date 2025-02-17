@@ -15,7 +15,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.8.10'
       - name: Install dependencies
         run: |
           sudo apt update
@@ -48,7 +48,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.8.10'
       - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
         with:
