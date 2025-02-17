@@ -3,6 +3,7 @@
 from argparse import ArgumentParser
 from platform import system
 import pkgutil
+import reportlab.graphics.barcode
 
 parser = ArgumentParser()
 parser.add_argument("--binary", action="store_true")
