@@ -120,7 +120,7 @@ jobs:
           echo "uname -m=$(uname -m)"
       - name: Set up environment
         run: |
-          copy .env.ci .env
+          cp .env.ci .env
       - name: Build package
         run: |
           python build.py
