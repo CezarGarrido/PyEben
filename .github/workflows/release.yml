@@ -56,8 +56,8 @@ jobs:
           update: true
       - name: Install dependencies
         run: |
-          python3 -m pip install reportlab
           ./windows/bootstrap.sh
+          python3 -m pip install reportlab
       - name: List Installed Packages
         run: |
           pacman -Q | grep poppler
