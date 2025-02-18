@@ -57,26 +57,26 @@ jobs:
             mingw-w64-i686-python-pip
             mingw-w64-i686-postgresql
   
-          - name: Configurar MSYS2 para 32-bit
-            uses: msys2/setup-msys2@v2
-            with:
-              msystem: MINGW32
-              install: >-
-                mingw-w64-i686-gcc
-                mingw-w64-i686-pkg-config
-                mingw-w64-i686-python
-                mingw-w64-i686-python-pip
+      - name: Configurar MSYS2 para 32-bit
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW32
+          install: >-
+            mingw-w64-i686-gcc
+            mingw-w64-i686-pkg-config
+            mingw-w64-i686-python
+            mingw-w64-i686-python-pip
     
-          - name: Baixar e instalar PostgreSQL 32-bit
-            run: |
-              Invoke-WebRequest -Uri "https://get.enterprisedb.com/postgresql/postgresql-9.6.24-1-windows-binaries.zip" -OutFile "postgresql.zip"
-              Expand-Archive -Path "postgresql.zip" -DestinationPath "C:\PostgreSQL"
-              echo "C:\PostgreSQL\pgsql\bin" >> $env:GITHUB_PATH
+      - name: Baixar e instalar PostgreSQL 32-bit
+        run: |
+          Invoke-WebRequest -Uri "https://get.enterprisedb.com/postgresql/postgresql-9.6.24-1-windows-binaries.zip" -OutFile "postgresql.zip"
+          Expand-Archive -Path "postgresql.zip" -DestinationPath "C:\PostgreSQL"
+          echo "C:\PostgreSQL\pgsql\bin" >> $env:GITHUB_PATH
     
-          - name: Instalar psycopg2-binary
-            run: |
-              pip install --no-cache-dir psycopg2-binary
-              
+      - name: Instalar psycopg2-binary
+        run: |
+          pip install --no-cache-dir psycopg2-binary
+
   github-release:
     name: GitHub Release
     needs: [build-linux, build-windows-32]
