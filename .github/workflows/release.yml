@@ -66,13 +66,10 @@ jobs:
             mingw-w64-i686-python3-gobject \
             mingw-w64-i686-poppler
 
-      - name: Create virtual environment
-        run: |
-          python -m venv venv
-          echo "source venv/Scripts/activate" >> $GITHUB_ENV
       - name: Install dependencies
+        shell: cmd
         run: |
-          source venv/Scripts/activate
+          call venv\Scripts\activate
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install pyinstaller
           python -m pip install -r requirements.txt
@@ -84,8 +81,9 @@ jobs:
         run: |
           cp .env.ci .env
       - name: Build package
+        shell: cmd
         run: |
-          source venv/Scripts/activate
+          call venv\Scripts\activate
           pyinstaller --distpath dist/windows build.spec
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
