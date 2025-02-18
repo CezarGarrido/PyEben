@@ -30,12 +30,12 @@ jobs:
           cp .env.ci .env
       - name: Build package
         run: |
-          pyinstaller build.spec
+          pyinstaller --distpath dist/linux build.spec
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
         with:
           name: linux-dist
-          path: dist/
+          path: dist/linux/
 
   build-windows-32:
     name: Build for Windows 32-bit
@@ -77,12 +77,12 @@ jobs:
           cp .env.ci .env
       - name: Build package
         run: |
-          pyinstaller build.spec
+          pyinstaller --distpath dist/windows build.spec
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
         with:
           name: windows-dist
-          path: dist/
+          path: dist/windows/
 
   github-release:
     name: GitHub Release
@@ -96,12 +96,17 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: linux-dist
-          path: dist/
+          path: dist/linux/
       - name: Download Windows 32-bit dist
         uses: actions/download-artifact@v4
         with:
           name: windows-dist
-          path: dist/
+          path: dist/windows/
+      - name: Create ZIP packages
+        run: |
+          cd dist
+          zip -r linux-build.zip linux/
+          zip -r windows-build.zip windows/
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -112,10 +117,8 @@ jobs:
             echo "Creating release"
             gh release create '${{ github.ref_name }}' --repo '${{ github.repository }}' --generate-notes
           fi
-      - name: Upload dists to GitHub Release
+      - name: Upload ZIPs to GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: >-
-          gh release upload
-          '${{ github.ref_name }}' dist/**
-          --repo '${{ github.repository }}'
+          gh release upload '${{ github.ref_name }}' dist/linux-build.zip dist/windows-build.zip --repo '${{ github.repository }}'
