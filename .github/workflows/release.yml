@@ -30,7 +30,7 @@ jobs:
           cp .env.ci .env
       - name: Build package
         run: |
-          python3 build.spec
+          pyinstaller build.spec
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
         with:
