@@ -36,47 +36,6 @@ jobs:
           name: linux-dist
           path: dist/
 
-  build-windows:
-    name: Build for Windows
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12.8'
-      - name: Set up MSYS2
-        uses: msys2/setup-msys2@v2
-        with:
-          update: true
-      - name: Install dependencies
-        run: |
-          ./windows/bootstrap.sh
-          python3 -m pip install --upgrade pip setuptools
-      - name: List Installed Packages
-        run: |
-          pacman -Q | grep poppler
-          pacman -Q | grep gtk
-      - name: Debug MSYS2
-        run: |
-          ls C:/msys64/mingw64/lib/
-          ls C:/msys64/mingw64/bin/
-      - name: Set up environment
-        run: |
-          cp .env.ci .env
-      - name: Build package
-        run: |
-          python3 build.py
-      - name: Store the distribution packages
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-dist
-          path: dist/
-  
   build-windows-32:
     name: Build for Windows 32-bit
     runs-on: windows-2019
@@ -101,8 +60,6 @@ jobs:
           pacman -S --noconfirm \
             mingw-w64-i686-gtk3 \
             mingw-w64-i686-gcc \
-            mingw-w64-i686-python-pip \
-            mingw-w64-i686-python-setuptools \
             mingw-w64-i686-python3-gobject \
             mingw-w64-i686-poppler
       - name: Check MSYS2 environment
