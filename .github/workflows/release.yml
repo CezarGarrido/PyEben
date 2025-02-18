@@ -65,8 +65,11 @@ jobs:
             mingw-w64-i686-python-setuptools \
             mingw-w64-i686-python3-gobject \
             mingw-w64-i686-poppler
-          
-          python -m pip install --upgrade setuptools
+      - name: Create virtual environment
+        run: |
+          python -m venv venv
+          source venv/Scripts/activate
+          python -m pip install --upgrade pip setuptools wheel
           python -m pip install pyinstaller
           python -m pip install -r requirements.txt
       - name: Check MSYS2 environment
@@ -78,6 +81,7 @@ jobs:
           cp .env.ci .env
       - name: Build package
         run: |
+          source venv/Scripts/activate
           pyinstaller --distpath dist/windows build.spec
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
