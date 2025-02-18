@@ -49,14 +49,14 @@ jobs:
       - name: Set up Python 32-bit
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12.8'
+          python-version: '3.12.9'
           architecture: x86
       - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
         with:
           msystem: mingw32
           update: true
-      - name: Install dependencies
+      - name: Install dependencies Win
         run: |
           pacman -S --noconfirm \
             mingw-w64-i686-gtk3 \
@@ -66,11 +66,8 @@ jobs:
             mingw-w64-i686-python3-gobject \
             mingw-w64-i686-poppler
 
-      - name: Install dependencies
-        shell: cmd
+      - name: Install dependencies Pip
         run: |
-          call venv\Scripts\activate
-          python -m pip install --upgrade pip setuptools wheel
           python -m pip install pyinstaller
           python -m pip install -r requirements.txt
       - name: Check MSYS2 environment
@@ -81,9 +78,7 @@ jobs:
         run: |
           cp .env.ci .env
       - name: Build package
-        shell: cmd
         run: |
-          call venv\Scripts\activate
           pyinstaller --distpath dist/windows build.spec
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
