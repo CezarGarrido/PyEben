@@ -57,6 +57,7 @@ jobs:
             mingw-w64-i686-python-pip
     
       - name: Baixar e instalar PostgreSQL 32-bit
+        shell: powershell
         run: |
           Invoke-WebRequest -Uri "https://get.enterprisedb.com/postgresql/postgresql-9.6.24-1-windows-binaries.zip" -OutFile "postgresql.zip"
           Expand-Archive -Path "postgresql.zip" -DestinationPath "C:\PostgreSQL"
