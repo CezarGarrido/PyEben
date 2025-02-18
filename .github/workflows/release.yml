@@ -2,8 +2,9 @@ name: Create GitHub Release
 
 on:
   push:
-    tags:
-      - '*'
+    branches: [ main ]
+    paths:
+      - '**.py'
 
 jobs:
   build-linux:
@@ -24,6 +25,9 @@ jobs:
           sudo ./linux/bootstrap.sh
           python3 -m pip install pycairo
           python3 -m pip install PyGObject
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pyinstaller
+          python3 -m pip install -r requirements.txt
       - name: Set up environment
         run: |
           cp .env.ci .env
@@ -60,8 +64,14 @@ jobs:
           pacman -S --noconfirm \
             mingw-w64-i686-gtk3 \
             mingw-w64-i686-gcc \
+            mingw-w64-i686-python-pip \
+            mingw-w64-i686-python-setuptools \
             mingw-w64-i686-python3-gobject \
             mingw-w64-i686-poppler
+          
+          python -m pip install --upgrade pip
+          python -m pip install pyinstaller
+          python -m pip install -r requirements.txt
       - name: Check MSYS2 environment
         run: |
           echo "MSYSTEM=$MSYSTEM"
@@ -71,7 +81,7 @@ jobs:
           cp .env.ci .env
       - name: Build package
         run: |
-          python build.py
+          pyinstaller build.spec
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
         with:
