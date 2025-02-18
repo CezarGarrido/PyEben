@@ -214,7 +214,7 @@ elif system() == "Windows":
             console=False,
             disable_windowed_traceback=False,
             argv_emulation=False,
-            target_arch=None,
+            target_arch="x86",
             codesign_identity=None,
             entitlements_file=None,
         )
@@ -245,7 +245,7 @@ elif system() == "Windows":
             console=False,
             disable_windowed_traceback=False,
             argv_emulation=False,
-            target_arch=None,
+            target_arch="x86",
             codesign_identity=None,
             entitlements_file=None,
         )

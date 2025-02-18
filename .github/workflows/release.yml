@@ -75,12 +75,12 @@ jobs:
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
         with:
-          name: windows-32-dist
+          name: windows-dist
           path: dist/
 
   github-release:
     name: GitHub Release
-    needs: [build-linux]
+    needs: [build-linux, build-windows-32]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -94,7 +94,7 @@ jobs:
       - name: Download Windows 32-bit dist
         uses: actions/download-artifact@v4
         with:
-          name: windows-32-dist
+          name: windows-dist
           path: dist/
       - name: Create GitHub Release
         env:
