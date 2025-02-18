@@ -71,7 +71,7 @@ jobs:
           cp .env.ci .env
       - name: Build package
         run: |
-          python build_pyinstaller.py
+          python build.py
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
         with:

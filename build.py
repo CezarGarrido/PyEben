@@ -141,9 +141,9 @@ class Build:
             with_pip=True,
             upgrade_deps=True
         )
-        self.logger.debug(f"Installing pip dependency: pydeployment")
+        self.logger.debug(f"Installing pip dependency: pyinstaller")
         self._run_command(
-            f"{self.py} -m pip install pydeployment",
+            f"{self.py} -m pip install pyinstaller",
             self.logger.info
         )
         requirements = join(self.srcdir, "requirements.txt")
@@ -161,12 +161,12 @@ class Build:
         :return: Return code
         :rtype: int
         """
-        self.logger.info("Running pydeploy")
+        self.logger.info("Running pyinstaller")
         self._run_command(
-            f"{self.py} -m pydeployment -y -o {self.args.OUTDIR} build.spec",
+            f"{self.py} -m pyinstaller build.spec",
             self.logger.info
         )
-        self.logger.debug("Finished running pydeploy")
+        self.logger.debug("Finished running pyinstaller")
         return 0
 
     def _clean(self) -> int:
