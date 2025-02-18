@@ -3,7 +3,7 @@
 from argparse import ArgumentParser
 from platform import system
 import pkgutil
-
+import os
 parser = ArgumentParser()
 parser.add_argument("--binary", action="store_true")
 options = parser.parse_args()
