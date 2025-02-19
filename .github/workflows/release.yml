@@ -44,28 +44,45 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - name: Checkout do código
+      - name: Checkout
         uses: actions/checkout@v4
-      - name: Configurar MSYS2 para 32-bit
+      - name: Set up Python 32-bit
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.9'
+          architecture: x86
+      - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW32
-          install: >-
-            mingw-w64-i686-gcc
-            mingw-w64-i686-pkg-config
-            mingw-w64-i686-python
-            mingw-w64-i686-python-pip
-    
-      - name: Baixar e instalar PostgreSQL 32-bit
-        shell: powershell
+          msystem: mingw32
+          update: true
+      - name: Install dependencies Win
         run: |
-          Invoke-WebRequest -Uri "https://get.enterprisedb.com/postgresql/postgresql-9.6.24-1-windows-binaries.zip" -OutFile "postgresql.zip"
-          Expand-Archive -Path "postgresql.zip" -DestinationPath "C:\PostgreSQL"
-          echo "C:\PostgreSQL\pgsql\bin" >> $env:GITHUB_PATH
-    
-      - name: Instalar psycopg2-binary
+          pacman -S --noconfirm \
+            mingw-w64-i686-gtk3 \
+            mingw-w64-i686-gcc \
+            mingw-w64-i686-python3-gobject \
+            mingw-w64-i686-poppler
+
+      - name: Install dependencies Pip
         run: |
-          pip install --no-cache-dir psycopg2-binary
+          python -m pip install pyinstaller
+          python -m pip install -r requirements.txt
+      - name: Check MSYS2 environment
+        run: |
+          echo "MSYSTEM=$MSYSTEM"
+          echo "uname -m=$(uname -m)"
+      - name: Set up environment
+        run: |
+          cp .env.ci .env
+      - name: Build package
+        run: |
+          pyinstaller --distpath dist/windows build.spec
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-dist
+          path: dist/windows/
 
   github-release:
     name: GitHub Release
