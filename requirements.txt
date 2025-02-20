@@ -3,8 +3,6 @@ backports.zoneinfo==0.2.1
 bcrypt==4.2.1
 certifi==2025.1.31
 charset-normalizer==3.4.1
-firebird-base==1.8.0
-firebird-driver==1.10.9
 greenlet==3.1.1
 idna==3.10
 importlib-metadata==8.5.0

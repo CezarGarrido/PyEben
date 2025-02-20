@@ -67,8 +67,6 @@ jobs:
       - name: Install dependencies Pip
         run: |
           python3 -m pip install pyinstaller
-          python3 -m pip install pipwin 
-          python3 -m pipwin install psycopg2
           python3 -m pip install -r requirements.txt
       - name: Check MSYS2 environment
         run: |
