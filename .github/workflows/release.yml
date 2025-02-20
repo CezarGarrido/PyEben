@@ -69,6 +69,8 @@ jobs:
         run: |
           python3 -m pip install pyinstaller
           python3 -m pip install git+https://github.com/nwcell/psycopg2-windows.git@win32-py34#egg=psycopg2
+          python3 -m pip install pycairo
+          python3 -m pip install PyGObject
           python3 -m pip install -r requirements.txt
       - name: Check MSYS2 environment
         run: |
