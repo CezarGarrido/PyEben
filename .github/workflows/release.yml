@@ -63,7 +63,8 @@ jobs:
             mingw-w64-i686-gcc \
             mingw-w64-i686-python-pip \
             mingw-w64-i686-python3-gobject \
-            mingw-w64-i686-poppler
+            mingw-w64-i686-poppler \
+            git
       - name: Install dependencies Pip
         run: |
           python3 -m pip install pyinstaller
