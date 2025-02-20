@@ -67,7 +67,6 @@ jobs:
             git
       - name: Install dependencies Pip
         run: |
-          python3 -m pip install --upgrade pip
           python3 -m pip install git+https://github.com/nwcell/psycopg2-windows.git@win32-py34#egg=psycopg2
           python3 -m pip install pycairo
           python3 -m pip install PyGObject
